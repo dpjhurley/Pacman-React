@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Entity from '../Entity/Entity.jsx';
 import Pacman from '../Pacman/Pacman.jsx';
 
@@ -6,7 +6,8 @@ const Stage = ({
     entities,
     TILE_SIZE,
     width,
-    height
+    height,
+    removeEntity
 }) => {
     const [ position, setPosition ] = useState({x: 0, y:0});
     const [ color, setColor ] = useState('light');
@@ -47,7 +48,22 @@ const Stage = ({
             setPosition(prevPosition => ({
                 ...prevPosition
             }));
-        } else if (walls.includes(newPos)) {
+        } else if (apples.some(entity => (entity.x === newPos.x && entity.y === newPos.y))) {
+            setPosition(prevPosition => ({
+                ...prevPosition,
+                x: newPos.x,
+                y: newPos.y
+            }));
+            setScore(prevScore => (prevScore + 1))
+            removeEntity('apples', {x: newPos.x, y: newPos.y});
+        } else if (bombs.some(entity => (entity.x === newPos.x && entity.y === newPos.y))) {
+            setPosition(prevPosition => ({
+                ...prevPosition,
+                x: newPos.x,
+                y: newPos.y
+            }));
+            removeEntity('bombs', {x: newPos.x, y: newPos.y});
+        }else if (walls.some(entity => (entity.x === newPos.x && entity.y === newPos.y))) {
             setPosition(prevPosition => ({
                 ...prevPosition
             }));
@@ -60,16 +76,14 @@ const Stage = ({
         }
     }
 
-    const collisionDetection = (x, y) => {
-        for (let i = 0; i < this.entityArray.length; i ++) {
-          if (this.entityArray[i].xpos === x *TILE_SIZE && this.entityArray[i].ypos === y * TILE_SIZE) {
-            return this.entityArray[i];
-          }
-        }
-        return null; 
-
-               
-      }
+    // const collisionDetection = (x, y) => {
+    //     for (let i = 0; i < this.entityArray.length; i ++) {
+    //       if (this.entityArray[i].xpos === x *TILE_SIZE && this.entityArray[i].ypos === y * TILE_SIZE) {
+    //         return this.entityArray[i];
+    //       }
+    //     }
+    //     return null; 
+    // }
 
     return (  
         <div className='stage' style={stageStyles}>
@@ -86,17 +100,17 @@ const Stage = ({
                 updateCollision={updateCollision}
             />
             {entities ? (
-                Object.keys(entities).map((keyname) => (
-                    entities[keyname].map((e, i) => (
-                        <Entity 
-                            key={i}
-                            type={keyname}
-                            xpos={e.x}
-                            ypos={e.y}
-                            TILE_SIZE={TILE_SIZE}
-                        />
+                    Object.keys(entities).map((keyname) => (
+                        entities[keyname].map((e, i) => (
+                            <Entity 
+                                key={i}
+                                type={keyname}
+                                xpos={e.x}
+                                ypos={e.y}
+                                TILE_SIZE={TILE_SIZE}
+                            />
+                        ))
                     ))
-                ))
                 ) : (
                     <div>loading</div>
                 )
