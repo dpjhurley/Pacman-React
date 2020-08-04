@@ -3,17 +3,22 @@ import Entity from '../Entity/Entity.jsx';
 import Pacman from '../Pacman/Pacman.jsx';
 
 const Stage = ({
-    entities,
+    data,
     TILE_SIZE,
     width,
     height,
-    removeEntity
 }) => {
     const [ position, setPosition ] = useState({x: 0, y:0});
     const [ color, setColor ] = useState('light');
     const [ gender, setGender ] = useState('boy');
     const [ score, setScore ] = useState(0);
     const [ alive, setAlive ] = useState(true);
+    const [ entities, setEntities ] = useState([]);
+    const [ removed, setRemoved ] = useState(false)
+
+    useEffect(() => {
+        updateActiveEntities();
+    }, [data, removed])
 
     const stageStyles = {
         height: height * TILE_SIZE + 'px',
@@ -62,6 +67,11 @@ const Stage = ({
                 x: newPos.x,
                 y: newPos.y
             }));
+            if (Math.random() > 0.5) {
+                setAlive(prevAlive => (
+                    !prevAlive
+                ));
+            }
             removeEntity('bombs', {x: newPos.x, y: newPos.y});
         }else if (walls.some(entity => (entity.x === newPos.x && entity.y === newPos.y))) {
             setPosition(prevPosition => ({
@@ -74,6 +84,26 @@ const Stage = ({
                 y: newPos.y
             }));
         }
+    }
+
+    const removeEntity = (entity, pos) => {
+        for(let i = 0; i < entities[entity].length; i++) {
+            if(entities[entity][i].x === pos.x && entities[entity][i].y === pos.y) {
+                setEntities(prevEntities => {
+                    const copyEntities = prevEntities;
+                    copyEntities[entity].splice(i, 1)
+                    return copyEntities;
+                })
+                setRemoved(prevRemoved => !prevRemoved)
+            }
+        }
+    }
+
+    const updateActiveEntities = () => {
+        setEntities(prevEntities => ({
+            ...prevEntities,
+            ...data
+        }))
     }
 
     // const collisionDetection = (x, y) => {

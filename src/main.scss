@@ -52,6 +52,11 @@ body {
   }
 
   &--tomb {
+    position: absolute;
+    font-weight: bold;
+    text-align: center;
+    padding-top: 65px;
+    user-select: none;
     background-image: url('./img/tomb.png');
   }
 }

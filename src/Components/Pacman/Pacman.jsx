@@ -18,20 +18,14 @@ const Pacman = ({
         top:'0px',
     });
     const [ mouth, setMouth ] = useState(true);
+    const [ pacClass, setPacClass ] = useState(`entity entity--pac pac${gender}-active-${color}`)
 
     useEffect(() => {
         updatePosition();
-    }, [position])
+        updateAppearance();
+    }, [position, alive])
 
     useKey((k) => move(k));
-
-    const updateAppearance = () => {
-        if (alive) {
-            `entity entity--pac pac${gender}-active-${color}`
-        } else {
-            'entity entity--tomb'
-        }
-    }
 
     const move = (key) => {
         if (alive) {
@@ -82,7 +76,7 @@ const Pacman = ({
     }
 
     const updatePosition = () => {
-        if (alive === true) {
+        if (alive) {
             setPacmanStyles(prevPacmanStyles => ({
                 ...prevPacmanStyles,
                 left: `${position.x * TILE_SIZE}px`,
@@ -91,8 +85,16 @@ const Pacman = ({
         }
     }
 
+    const updateAppearance = () => {
+        if (!alive) {
+            setPacClass(prevPacClass => (
+                'entity entity--tomb'
+            )) 
+        }
+    }
+
     return (
-        <div className={`entity entity--pac pac${gender}-active-${color}`} style={pacmanStyles} >
+        <div className={pacClass} style={pacmanStyles} >
             <div>{`Total = ${score}`}</div>
         </div>
     )
